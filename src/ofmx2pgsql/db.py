@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import importlib.resources as resources
 from typing import Iterable, Mapping
 
 from . import parser
@@ -76,7 +77,12 @@ def validate_dataset(
 
 def apply_schema_migration(conn: "psycopg.Connection", *, schema: str = "ofmx") -> None:
     migration_path = Path(__file__).resolve().parents[2] / "sql" / "migrations" / "001_init.sql"
-    sql = migration_path.read_text(encoding="utf-8")
+    if migration_path.exists():
+        sql = migration_path.read_text(encoding="utf-8")
+    else:
+        sql = resources.files("ofmx2pgsql.sql").joinpath("migrations/001_init.sql").read_text(
+            encoding="utf-8"
+        )
     sql = sql.replace("CREATE SCHEMA IF NOT EXISTS ofmx;", f"CREATE SCHEMA IF NOT EXISTS {schema};")
     sql = sql.replace("ofmx.", f"{schema}.")
     conn.execute(sql)

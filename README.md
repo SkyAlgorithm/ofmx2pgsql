@@ -3,27 +3,27 @@
 Lightweight importer for OpenFlightMaps OFMX data into PostgreSQL/PostGIS. The goal is a small, auditable pipeline that parses OFMX XML, normalizes geometries, and loads core aviation features into a spatial schema.
 
 ## Status
-Early planning and data collection. See `TODO.md` for the build roadmap and `PROGRESS.md` for a running log of what exists today.
+Importer and schema are functional for the LK sample dataset. See `TODO.md` for remaining work and `PROGRESS.md` for a running log of changes.
 
 ## Setup
 - `pip install -e .` installs the package and the `psycopg` dependency.
 - `config/ofmx2pgsql.example.ini` shows the supported config keys.
+- `Dockerfile` builds a container that downloads a snapshot and imports it into PostGIS.
 
 ## Repository Layout
 - `ofmx_lk/` sample OFMX data and reference materials.
 - `src/ofmx2pgsql/` application package (CLI, parsing, DB loaders).
 - `sql/migrations/` PostGIS schema migrations.
 - `config/` example configuration files.
-- `tests/` test suite (to be added).
+- `tests/` minimal unit tests for parser and CLI.
 - `TODO.md` roadmap and design checklist.
 - `AGENTS.md` contributor guide for this repository.
 
-## Planned Capabilities
-- Streaming XML parsing for OFMX datasets.
-- Geometry normalization (points and polygons initially).
-- PostGIS schema for airports, runways, airspaces, navaids, and waypoints.
-- CLI for imports, dry runs, and logging.
-- Schema aligned to the LK sample entities (Ahp, Rwy, Rdn, Ase/Abd, Dpn, Ndb/Vor/Dme).
+## Current Capabilities
+- Streaming XML parsing for OFMX datasets (Ahp, Rwy, Rdn, Ase, Dpn, Ndb/Vor/Dme).
+- Airspace shapes parsed from OFM shape extension XML.
+- PostGIS schema and import pipeline for airports, runways, runway ends, airspaces, navaids, and waypoints.
+- CLI for scan/import/validate, with dry-run, verbose summaries, and JSON output.
 
 ## Development Commands
 - `python -m unittest discover -s tests` runs the minimal CLI smoke tests in `tests/`.
@@ -36,6 +36,19 @@ Early planning and data collection. See `TODO.md` for the build roadmap and `PRO
 - `python -m ofmx2pgsql validate --dsn \"postgresql://...\" --ofmx ofmx_lk/isolated/ofmx_lk.ofmx --output-json` emits validation output as JSON.
 - `python -m ofmx2pgsql import --config config/ofmx2pgsql.example.ini --dry-run --verbose` uses config values with CLI overrides.
 - `python -m ofmx2pgsql validate --config config/ofmx2pgsql.example.ini --output-json` uses config defaults with JSON output.
+
+## Docker Import
+Build the image and run it with database credentials. The container downloads the snapshot URL and imports it.
+
+```sh
+docker build -t ofmx2pgsql .
+docker run --rm \\
+  -e PG_DSN=\"postgresql://user:pass@host:5432/db\" \\
+  -e OFMX_URL=\"https://snapshots.openflightmaps.org/live/2513/ofmx/lkaa/latest/ofmx_lk.zip\" \\
+  -e PG_SCHEMA=\"ofmx\" \\
+  -e APPLY_MIGRATIONS=\"true\" \\
+  ofmx2pgsql
+```
 
 ## Data Notes
 The sample data in `ofmx_lk/` is treated as reference input. Avoid editing these files unless intentionally updating fixtures.
