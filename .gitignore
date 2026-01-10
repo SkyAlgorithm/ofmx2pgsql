@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Build artifacts
+dist/
+build/
+
+# Environment
+.env
+.envrc
+
+# Logs and temp
+*.log
+*.tmp
+*.swp
+
+# Databases
+*.db
+*.sqlite

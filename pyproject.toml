@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ofmx2pgsql"
+version = "0.0.1"
+description = "Lightweight importer for OpenFlightMaps OFMX data into PostGIS."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "ofmx2pgsql contributors" }
+]
+scripts = { ofmx2pgsql = "ofmx2pgsql.cli:main" }
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
