@@ -42,11 +42,11 @@ Build the image and run it with database credentials. The container downloads th
 
 ```sh
 docker build -t ofmx2pgsql .
-docker run --rm \\
-  -e PG_DSN=\"postgresql://user:pass@host:5432/db\" \\
-  -e OFMX_URL=\"https://snapshots.openflightmaps.org/live/2513/ofmx/lkaa/latest/ofmx_lk.zip\" \\
-  -e PG_SCHEMA=\"ofmx\" \\
-  -e APPLY_MIGRATIONS=\"true\" \\
+docker run --rm \
+  -e PG_DSN="postgresql://user:pass@host:5432/db" \
+  -e OFMX_URL="https://snapshots.openflightmaps.org/live/2513/ofmx/lkaa/latest/ofmx_lk.zip" \
+  -e PG_SCHEMA="ofmx" \
+  -e APPLY_MIGRATIONS="true" \
   ofmx2pgsql
 ```
 
