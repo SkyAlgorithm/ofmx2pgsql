@@ -17,7 +17,6 @@
 - INI-based config support added for CLI defaults.
 - Schema selection and JSON validation output added to the CLI.
 - Airspace uniqueness relaxed to preserve duplicate OFMX IDs.
-- Docker Compose stack added with a custom PostGIS image for arm64 hosts.
 - Implementation work has not started (no parser, schema, or imports yet).
 
 ## Milestones

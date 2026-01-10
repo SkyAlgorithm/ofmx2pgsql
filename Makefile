@@ -1,4 +1,4 @@
-.PHONY: docker-build docker-import docker-compose-import
+.PHONY: docker-build docker-import
 
 docker-build:
 	docker build -t ofmx2pgsql .
@@ -10,6 +10,3 @@ docker-import:
 		-e PG_SCHEMA="${PG_SCHEMA}" \
 		-e APPLY_MIGRATIONS="${APPLY_MIGRATIONS}" \
 		ofmx2pgsql
-
-docker-compose-import:
-	docker compose up --build --abort-on-container-exit
