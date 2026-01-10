@@ -28,3 +28,5 @@ build/
 # OFMX data (downloaded/extracted)
 ofmx_lk.zip
 ofmx_lk/
+data/ofmx_lk.zip
+data/ofmx_lk/
