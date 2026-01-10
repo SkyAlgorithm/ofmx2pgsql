@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e .
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t ofmx2pgsql .
+      - name: Dry-run import in container
+        run: |
+          docker run --rm \
+            -e PG_DSN="postgresql://dummy:dummy@localhost:5432/dummy" \
+            -e OFMX_URL="https://snapshots.openflightmaps.org/live/2513/ofmx/lkaa/latest/ofmx_lk.zip" \
+            -e PG_SCHEMA="ofmx" \
+            -e APPLY_MIGRATIONS="false" \
+            -e DRY_RUN="true" \
+            -e VERBOSE="false" \
+            ofmx2pgsql

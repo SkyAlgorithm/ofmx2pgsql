@@ -1,136 +1,31 @@
 # ofmx2pgsql – TODO List
 
-Build a lightweight importer for OpenFlightMaps OFMX data into PostgreSQL/PostGIS.
+Focused, remaining work for the OFMX-to-PostGIS importer.
 
----
+## Done (Milestones)
+- Repository bootstrapped (docs, config, tests, schema, CLI).
+- Parser and importer wired to LK sample data.
+- Import validation and dry-run workflows implemented.
+## Scope Decisions
+- Confirm non-goals (no rendering, no tile generation, limited edge-case support).
+- Lock CRS (EPSG:4326 only).
+- Confirm geometry fidelity (points, lines, polygons; arcs handled only via extension).
+- Decide altitude handling (attribute columns vs 3D geometries).
 
-## Phase -1 — Repository Setup
+## OFMX Understanding
+- Obtain and pin the OFMX XSD schema version used by the dataset.
+- Document mandatory vs optional fields for Ahp/Rwy/Rdn/Ase/Dpn/Ndb/Vor/Dme.
+- Clarify coordinate formats and arc/circle handling in core XML vs extensions.
 
-- [x] Add contributor guidelines (`AGENTS.md`)
-- [x] Add project overview (`README.md`)
-- [x] Add progress log (`PROGRESS.md`)
-- [x] Add base ignore rules (`.gitignore`)
+## Parsing & Geometry
+- Add geometry construction helpers (Shapely or raw WKT) for non-airspace shapes.
+- Validate geometries (self-intersections, ring closure, SRID consistency).
+- Parse altitude limits into numeric fields with normalized units.
 
----
+## Database & Import
+- Populate metadata fields (`source`, `cycle`, `valid_from`, `valid_to`) during import.
+- Decide how to version or archive imports across cycles.
 
-## Phase 0 — Scope & Principles
-
-- [ ] Define non-goals
-  - [ ] No rendering optimizations
-  - [ ] No tile generation
-  - [ ] No attempt to support all OFMX edge cases initially
-- [ ] Decide target CRS
-  - [ ] Use EPSG:4326 only
-- [ ] Decide geometry fidelity
-  - [ ] Points and polygons only (no arcs initially)
-- [ ] Define vertical dimension handling
-  - [ ] Store altitudes as attributes (`lower_ft`, `upper_ft`)
-  - [ ] No 3D geometries in v1
-
----
-
-## Phase 1 — Understand OFMX Structure
-
-- [ ] Obtain OFMX XSD schema
-- [ ] Identify top-level entities
-  - [ ] Airports
-  - [ ] Runways
-  - [ ] RunwayEnds
-  - [ ] Airspaces
-  - [ ] Navaids
-  - [ ] Waypoints
-- [ ] Map ID relationships
-  - [ ] Airport ↔ Runway
-  - [ ] Runway ↔ RunwayEnd
-- [ ] Identify coordinate representations
-  - [ ] Lat/Lon formats
-  - [ ] Polygon definitions
-  - [ ] Circles / arcs
-- [ ] Document mandatory vs optional fields
-
----
-
-## Phase 2 — Define PostGIS Schema
-
-- [x] Design core tables
-  - [ ] airports
-  - [ ] runways
-  - [ ] runway_ends
-  - [ ] airspaces
-  - [ ] navaids
-  - [ ] waypoints
-- [x] Define primary keys
-- [x] Store OFMX source IDs
-- [x] Define foreign keys
-- [x] Define geometry columns
-  - [x] POINT for airports, navaids, waypoints
-  - [x] LINESTRING for runways, POINT for runway ends
-  - [x] MULTIPOLYGON for airspaces
-- [x] Add metadata fields
-  - [ ] source
-  - [ ] cycle
-  - [ ] valid_from
-  - [ ] valid_to
-- [x] Create spatial indexes (GIST)
-
----
-
-## Phase 3 — Project Skeleton
-
-- [x] Create repository `ofmx2pgsql`
-- [x] Choose language
-  - [x] Python
-- [ ] Setup virtual environment
-- [x] Setup CLI framework (`argparse` or `typer`)
-- [x] Define project structure
-
----
-
-## Phase 4 — XML Parsing Layer
-
-- [x] Add parser module scaffold
-- [x] Implement streaming XML parser (`xml.etree.ElementTree.iterparse`)
-- [x] Implement entity parsers
-- [x] Normalize coordinates to decimal degrees
-- [x] Preserve OFMX IDs
-
----
-
-## Phase 5 — Geometry Construction
-
-- [ ] Convert coordinates to Shapely geometries
-- [ ] Validate geometries
-- [ ] Parse altitude limits
-
----
-
-## Phase 6 — Database Writer
-
-- [x] Implement database connection
-- [x] Implement bulk inserts
-- [x] Implement idempotent loads
-
----
-
-## Phase 7 — CLI Features
-
-- [x] Import command
-- [x] Schema selection
-- [x] Dry run
-- [x] Verbose logging
-- [x] Config file defaults
-
----
-
-## Phase 8 — Validation & QA
-
-- [x] Compare counts with source
-- [x] JSON validation output
-- [ ] Visual inspection in QGIS
-
----
-
-## Phase 9 — Documentation
-
-- [ ] README
-- [ ] Example config
+## Validation & QA
+- Visual inspection in QGIS for a sample import.
+- Add a lightweight regression dataset comparison (counts + spot checks).

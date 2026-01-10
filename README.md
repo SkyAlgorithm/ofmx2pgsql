@@ -9,6 +9,7 @@ Importer and schema are functional for the LK sample dataset. See `TODO.md` for 
 - `pip install -e .` installs the package and the `psycopg` dependency.
 - `config/ofmx2pgsql.example.ini` shows the supported config keys.
 - `Dockerfile` builds a container that downloads a snapshot and imports it into PostGIS.
+- `docker-compose.yml` provides a PostGIS + importer stack for local testing.
 
 ## Repository Layout
 - `ofmx_lk/` sample OFMX data and reference materials.
@@ -49,6 +50,15 @@ docker run --rm \\
   -e APPLY_MIGRATIONS=\"true\" \\
   ofmx2pgsql
 ```
+
+## Docker Compose
+Spin up a local PostGIS instance and run a one-shot import.
+
+```sh
+docker compose up --build --abort-on-container-exit
+```
+
+The compose stack builds a lightweight Postgres 18 + PostGIS image from `docker/postgis.Dockerfile` to support arm64 hosts.
 
 ## Data Notes
 The sample data in `ofmx_lk/` is treated as reference input. Avoid editing these files unless intentionally updating fixtures.

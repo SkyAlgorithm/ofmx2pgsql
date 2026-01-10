@@ -1,0 +1,26 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: docker/postgis.Dockerfile
+    environment:
+      POSTGRES_USER: ofmx
+      POSTGRES_PASSWORD: ofmx
+      POSTGRES_DB: ofmx
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ofmx -d ofmx"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  importer:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PG_DSN: postgresql://ofmx:ofmx@db:5432/ofmx
+      OFMX_URL: https://snapshots.openflightmaps.org/live/2513/ofmx/lkaa/latest/ofmx_lk.zip
+      PG_SCHEMA: ofmx
+      APPLY_MIGRATIONS: "true"
+      VERBOSE: "true"
