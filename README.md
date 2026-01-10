@@ -65,8 +65,8 @@ The LK sample data is fetched on demand into `data/ofmx_lk/` via `scripts/fetch_
 
 Airspace records in the LK sample reuse `AseUid/@mid`, so `ofmx.airspaces.ofmx_id` is not unique. The schema uses a composite uniqueness constraint on `(ofmx_id, region, code_id, code_type, name)` to preserve distinct entries while keeping imports idempotent.
 
-## Contributing
-See `CONTRIBUTING.md` for workflow, style, and pull request expectations.
+## Development Notes
+See `CONTRIBUTING.md` for workflow and style notes used by maintainers.
 
 ## Security
 See `SECURITY.md` for reporting guidance.

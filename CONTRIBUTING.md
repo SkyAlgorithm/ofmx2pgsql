@@ -1,6 +1,6 @@
-# Contributing
+# Development Notes
 
-Thanks for helping improve `ofmx2pgsql`. This repository is maintained by SkyAlgorithm and aims to stay small, auditable, and reliable.
+Notes for maintainers working on `ofmx2pgsql`. The goal is to keep the codebase small, auditable, and reliable.
 
 ## Quick Start
 - Install locally: `pip install -e .`
@@ -14,11 +14,11 @@ Thanks for helping improve `ofmx2pgsql`. This repository is maintained by SkyAlg
 - Keep type hints where they improve clarity.
 - Avoid adding large data files to the repo (use `scripts/fetch_ofmx.sh`).
 
-## Pull Requests
-Please include:
+## Changes
+When making changes, include:
 - A short summary of what changed and why.
 - Any new commands or flags (with examples).
 - Tests or validation steps run locally.
 
 ## Scope
-Focus changes on OFMX parsing, schema evolution, and import reliability. If you are proposing major new features, open an issue first.
+Focus changes on OFMX parsing, schema evolution, and import reliability. For major new features, align with SkyAlgorithm maintainers first.
