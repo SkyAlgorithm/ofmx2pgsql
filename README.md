@@ -16,8 +16,6 @@ Importer and schema are functional for the LK sample dataset. See `TODO.md` for 
 - `sql/migrations/` PostGIS schema migrations.
 - `config/` example configuration files.
 - `tests/` minimal unit tests for parser and CLI.
-- `TODO.md` roadmap and design checklist.
-- `AGENTS.md` contributor guide for this repository.
 
 ## Current Capabilities
 - Streaming XML parsing for OFMX datasets (Ahp, Rwy, Rdn, Ase, Dpn, Ndb/Vor/Dme).
@@ -56,3 +54,13 @@ docker run --rm \
 The LK sample data is fetched on demand into `data/ofmx_lk/` via `scripts/fetch_ofmx.sh` and is ignored by git.
 
 Airspace records in the LK sample reuse `AseUid/@mid`, so `ofmx.airspaces.ofmx_id` is not unique. The schema uses a composite uniqueness constraint on `(ofmx_id, region, code_id, code_type, name)` to preserve distinct entries while keeping imports idempotent.
+
+## Roadmap
+- Expand parser coverage for additional OFMX features (procedures, routes, obstacles).
+- Add integration tests that validate full imports against a disposable PostGIS instance.
+
+## License
+MIT. See `LICENSE`.
+
+## Data Sources
+OFMX data is sourced from OpenFlightMaps snapshots. Review their terms and attribution requirements before redistribution.
