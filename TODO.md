@@ -52,25 +52,26 @@ Build a lightweight importer for OpenFlightMaps OFMX data into PostgreSQL/PostGI
 
 ## Phase 2 — Define PostGIS Schema
 
-- [ ] Design core tables
+- [x] Design core tables
   - [ ] airports
   - [ ] runways
   - [ ] runway_ends
   - [ ] airspaces
   - [ ] navaids
   - [ ] waypoints
-- [ ] Define primary keys
-- [ ] Store OFMX source IDs
-- [ ] Define foreign keys
-- [ ] Define geometry columns
-  - [ ] POINT for airports, navaids, waypoints
-  - [ ] POLYGON / MULTIPOLYGON for airspaces
-- [ ] Add metadata fields
+- [x] Define primary keys
+- [x] Store OFMX source IDs
+- [x] Define foreign keys
+- [x] Define geometry columns
+  - [x] POINT for airports, navaids, waypoints
+  - [x] LINESTRING for runways, POINT for runway ends
+  - [x] MULTIPOLYGON for airspaces
+- [x] Add metadata fields
   - [ ] source
   - [ ] cycle
   - [ ] valid_from
   - [ ] valid_to
-- [ ] Create spatial indexes (GIST)
+- [x] Create spatial indexes (GIST)
 
 ---
 
@@ -88,10 +89,10 @@ Build a lightweight importer for OpenFlightMaps OFMX data into PostgreSQL/PostGI
 ## Phase 4 — XML Parsing Layer
 
 - [x] Add parser module scaffold
-- [ ] Implement streaming XML parser (`lxml.iterparse`)
-- [ ] Implement entity parsers
-- [ ] Normalize coordinates to decimal degrees
-- [ ] Preserve OFMX IDs
+- [x] Implement streaming XML parser (`xml.etree.ElementTree.iterparse`)
+- [x] Implement entity parsers
+- [x] Normalize coordinates to decimal degrees
+- [x] Preserve OFMX IDs
 
 ---
 
@@ -105,24 +106,26 @@ Build a lightweight importer for OpenFlightMaps OFMX data into PostgreSQL/PostGI
 
 ## Phase 6 — Database Writer
 
-- [ ] Implement database connection
-- [ ] Implement bulk inserts
-- [ ] Implement idempotent loads
+- [x] Implement database connection
+- [x] Implement bulk inserts
+- [x] Implement idempotent loads
 
 ---
 
 ## Phase 7 — CLI Features
 
-- [ ] Import command
-- [ ] Schema selection
-- [ ] Dry run
-- [ ] Verbose logging
+- [x] Import command
+- [x] Schema selection
+- [x] Dry run
+- [x] Verbose logging
+- [x] Config file defaults
 
 ---
 
 ## Phase 8 — Validation & QA
 
-- [ ] Compare counts with source
+- [x] Compare counts with source
+- [x] JSON validation output
 - [ ] Visual inspection in QGIS
 
 ---
