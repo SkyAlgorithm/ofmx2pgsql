@@ -7,7 +7,7 @@ An open-source SkyAlgorithm project.
 Lightweight importer for OpenFlightMaps OFMX data into PostgreSQL/PostGIS. The goal is a small, auditable pipeline that parses OFMX XML, normalizes geometries, and loads core aviation features into a spatial schema.
 
 ## Status
-Importer and schema are functional for the LK sample dataset. Data is fetched on demand and CI validates parser behavior and the Docker import path.
+Importer and schema are functional for LKAA and ED snapshots. Data is fetched on demand and CI validates parser behavior and the Docker import path.
 
 ## Design Principles
 - Keep the pipeline small and auditable.
