@@ -1,9 +1,18 @@
 # ofmx2pgsql
 
+[![CI](https://github.com/SkyAlgorithm/ofmx2pgsql/actions/workflows/ci.yml/badge.svg)](https://github.com/SkyAlgorithm/ofmx2pgsql/actions/workflows/ci.yml)
+
+An open-source SkyAlgorithm project.
+
 Lightweight importer for OpenFlightMaps OFMX data into PostgreSQL/PostGIS. The goal is a small, auditable pipeline that parses OFMX XML, normalizes geometries, and loads core aviation features into a spatial schema.
 
 ## Status
-Importer and schema are functional for the LK sample dataset. See `TODO.md` for remaining work and `PROGRESS.md` for a running log of changes.
+Importer and schema are functional for the LK sample dataset. Data is fetched on demand and CI validates parser behavior and the Docker import path.
+
+## Design Principles
+- Keep the pipeline small and auditable.
+- Favor explicit schemas over implicit inference.
+- Make data fetching and imports reproducible.
 
 ## Setup
 - `pip install -e .` installs the package and the `psycopg` dependency.
@@ -16,6 +25,7 @@ Importer and schema are functional for the LK sample dataset. See `TODO.md` for 
 - `sql/migrations/` PostGIS schema migrations.
 - `config/` example configuration files.
 - `tests/` minimal unit tests for parser and CLI.
+- `scripts/` helper scripts for fetching data and container workflows.
 
 ## Current Capabilities
 - Streaming XML parsing for OFMX datasets (Ahp, Rwy, Rdn, Ase, Dpn, Ndb/Vor/Dme).
@@ -54,6 +64,12 @@ docker run --rm \
 The LK sample data is fetched on demand into `data/ofmx_lk/` via `scripts/fetch_ofmx.sh` and is ignored by git.
 
 Airspace records in the LK sample reuse `AseUid/@mid`, so `ofmx.airspaces.ofmx_id` is not unique. The schema uses a composite uniqueness constraint on `(ofmx_id, region, code_id, code_type, name)` to preserve distinct entries while keeping imports idempotent.
+
+## Contributing
+See `CONTRIBUTING.md` for workflow, style, and pull request expectations.
+
+## Security
+See `SECURITY.md` for reporting guidance.
 
 ## Roadmap
 - Expand parser coverage for additional OFMX features (procedures, routes, obstacles).
