@@ -24,3 +24,7 @@ build/
 # Databases
 *.db
 *.sqlite
+
+# OFMX data (downloaded/extracted)
+ofmx_lk.zip
+ofmx_lk/
