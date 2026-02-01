@@ -36,20 +36,33 @@ def build_parser() -> argparse.ArgumentParser:
 
     import_parser = subparsers.add_parser(
         "import",
-        help="Import OFMX data into PostGIS.",
+        help="Import OFMX or ARINC data into PostGIS.",
     )
     import_parser.add_argument("--dsn", help="PostgreSQL DSN string.")
-    import_parser.add_argument(
+    import_source = import_parser.add_mutually_exclusive_group()
+    import_source.add_argument(
         "--ofmx",
         type=Path,
         metavar="PATH",
         help="Path to an OFMX snapshot XML file.",
+    )
+    import_source.add_argument(
+        "--arinc",
+        type=Path,
+        metavar="PATH",
+        help="Path to an ARINC 424 .pc file or a ZIP containing it.",
     )
     import_parser.add_argument(
         "--shapes",
         type=Path,
         metavar="PATH",
         help="Optional OFM shape extension XML file for airspace polygons.",
+    )
+    import_parser.add_argument(
+        "--openair",
+        type=Path,
+        metavar="PATH",
+        help="Optional OpenAIR file or ZIP with airspace polygons (used with ARINC).",
     )
     import_parser.add_argument(
         "--apply-migrations",
@@ -76,11 +89,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Compare parsed counts with database row counts.",
     )
     validate_parser.add_argument("--dsn", help="PostgreSQL DSN string.")
-    validate_parser.add_argument(
+    validate_source = validate_parser.add_mutually_exclusive_group()
+    validate_source.add_argument(
         "--ofmx",
         type=Path,
         metavar="PATH",
         help="Path to an OFMX snapshot XML file.",
+    )
+    validate_source.add_argument(
+        "--arinc",
+        type=Path,
+        metavar="PATH",
+        help="Path to an ARINC 424 .pc file or a ZIP containing it.",
     )
     validate_parser.add_argument(
         "--shapes",
@@ -102,6 +122,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Emit validation output as JSON.",
     )
+    validate_parser.add_argument(
+        "--filter-source",
+        help="Restrict validation counts to rows with matching source.",
+    )
+    validate_parser.add_argument(
+        "--filter-cycle",
+        help="Restrict validation counts to rows with matching cycle.",
+    )
     return parser
 
 
@@ -118,10 +146,13 @@ def main(argv: list[str] | None = None) -> int:
         _apply_config(args)
         _finalize_schema(args)
         _require_import_args(parser, args)
+        source_path, source_format = _resolve_source(parser, args)
         import_dataset(
             dsn=args.dsn,
-            ofmx_path=args.ofmx,
-            shapes_path=args.shapes,
+            source_path=source_path,
+            shapes_path=args.shapes if source_format == "ofmx" else None,
+            openair_path=args.openair if source_format == "arinc" else None,
+            source_format=source_format,
             apply_migrations=args.apply_migrations,
             dry_run=args.dry_run,
             verbose=args.verbose,
@@ -132,10 +163,14 @@ def main(argv: list[str] | None = None) -> int:
         _apply_config(args)
         _finalize_schema(args)
         _require_import_args(parser, args)
+        source_path, source_format = _resolve_source(parser, args)
         result = validate_dataset(
             dsn=args.dsn,
-            ofmx_path=args.ofmx,
-            shapes_path=args.shapes,
+            source_path=source_path,
+            shapes_path=args.shapes if source_format == "ofmx" else None,
+            source_format=source_format,
+            filter_source=args.filter_source,
+            filter_cycle=args.filter_cycle,
             apply_migrations=args.apply_migrations,
             schema=args.schema,
         )
@@ -182,8 +217,12 @@ def _apply_config(args: argparse.Namespace) -> None:
         args.dsn = section.get("dsn")
     if getattr(args, "ofmx", None) is None and "ofmx" in section:
         args.ofmx = Path(section.get("ofmx"))
+    if getattr(args, "arinc", None) is None and "arinc" in section:
+        args.arinc = Path(section.get("arinc"))
     if getattr(args, "shapes", None) is None and "shapes" in section:
         args.shapes = Path(section.get("shapes"))
+    if getattr(args, "openair", None) is None and "openair" in section:
+        args.openair = Path(section.get("openair"))
     if getattr(args, "apply_migrations", None) is False and "apply_migrations" in section:
         args.apply_migrations = section.getboolean("apply_migrations")
     if getattr(args, "dry_run", None) is False and "dry_run" in section:
@@ -194,6 +233,10 @@ def _apply_config(args: argparse.Namespace) -> None:
         args.schema = section.get("schema")
     if getattr(args, "output_json", None) is False and "output_json" in section:
         args.output_json = section.getboolean("output_json")
+    if getattr(args, "filter_source", None) is None and "filter_source" in section:
+        args.filter_source = section.get("filter_source")
+    if getattr(args, "filter_cycle", None) is None and "filter_cycle" in section:
+        args.filter_cycle = section.get("filter_cycle")
 
 
 def _finalize_schema(args: argparse.Namespace) -> None:
@@ -205,10 +248,23 @@ def _require_import_args(parser: argparse.ArgumentParser, args: argparse.Namespa
     missing = []
     if not getattr(args, "dsn", None):
         missing.append("--dsn")
-    if not getattr(args, "ofmx", None):
-        missing.append("--ofmx")
+    if not getattr(args, "ofmx", None) and not getattr(args, "arinc", None):
+        missing.append("--ofmx/--arinc")
     if missing:
         parser.error(f"Missing required arguments: {', '.join(missing)}")
+
+
+def _resolve_source(
+    parser: argparse.ArgumentParser, args: argparse.Namespace
+) -> tuple[Path, str]:
+    if getattr(args, "ofmx", None) and getattr(args, "arinc", None):
+        parser.error("Use only one of --ofmx or --arinc.")
+    if getattr(args, "arinc", None):
+        return args.arinc, "arinc"
+    if getattr(args, "ofmx", None):
+        return args.ofmx, "ofmx"
+    parser.error("Missing required arguments: --ofmx or --arinc.")
+    raise RuntimeError("unreachable")
 
 
 if __name__ == "__main__":

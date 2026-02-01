@@ -1,0 +1,9 @@
+SEURP LSGGLSA        0        N N46141800E006063400E003001411                   P    MWGE    GENEVE COINTRIN               009592601
+SEURP LSGGLSGRW05    0127950460 N46134023E006053824                          164                                           009602601
+SEURP LSGGLSGRW23    0127952260 N46150130E006073722                          164                                           009612601
+SEUREAENRT   SW    LS0    V     N46071900E005535700                                 WGE           SW                       009782601
+SEURPCLSGGLS PLAYA LS0    V     N46143800E006091000                                 WGE           PLAYA                    009812601
+SEURD        PAS   LS011660VDUW N46094930E006000000    N46094930E006000000E0030     1  040WGEPASSEIRY                      008802601
+SEURUCLSKLSADB      00100B    G N45474800E005331800                              FL115MFL155MTMA LSGG 10                   000012601
+SEURURLSRLS-R86 BIE 00100B    G N46344700E006212100                              GND   05500MR LS-R86 BIERE                010372601
+SEURUFLSF1    F00100            G N47352389E007352077                           FL195FL195UNLTD   FIR LSAS                 020142601

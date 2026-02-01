@@ -31,7 +31,10 @@ Importer and schema are functional for LKAA and ED snapshots. Data is fetched on
 
 ## Current Capabilities
 - Streaming XML parsing for OFMX datasets (Ahp, Rwy, Rdn, Ase, Dpn, Ndb/Vor/Dme).
+- ARINC 424 parsing for airports, runways, runway ends, airspaces, navaids, and waypoints.
 - Airspace shapes parsed from OFM shape extension XML.
+- ARINC airspace imports load metadata only (no polygon geometry).
+- OpenAIR parsing for ARINC airspace polygons when supplied via `--openair`.
 - PostGIS schema and import pipeline for airports, runways, runway ends, airspaces, navaids, and waypoints.
 - CLI for scan/import/validate, with dry-run, verbose summaries, and JSON output.
 
@@ -61,11 +64,52 @@ docker run --rm \
   ofmx2pgsql
 ```
 
-
-## Data Notes
+## OFMX Data Notes
 The LK sample data is fetched on demand into `data/ofmx_lk/` via `scripts/fetch_ofmx.sh` and is ignored by git.
 
 Airspace records in the LK sample reuse `AseUid/@mid`, so `ofmx.airspaces.ofmx_id` is not unique. The schema uses a composite uniqueness constraint on `(ofmx_id, region, code_id, code_type, name)` to preserve distinct entries while keeping imports idempotent.
+
+## ARINC / OpenAIR
+OpenFlightMaps does not publish OFMX for Switzerland (LS). Use ARINC 424 plus OpenAIR shapes for this region.
+
+ARINC + OpenAIR (Switzerland) import with the Docker image:
+
+```sh
+docker run --rm \
+  -e PG_DSN="postgresql://user:pass@host:5432/db" \
+  -e ARINC_URL="https://snapshots.openflightmaps.org/live/2601/arinc424/lsas/latest/arinc_ls.zip" \
+  -e OPENAIR_URL="https://snapshots.openflightmaps.org/live/2601/openair/lsas/latest/openair_ls.zip" \
+  -e PG_SCHEMA="ofmx" \
+  -e APPLY_MIGRATIONS="true" \
+  ofmx2pgsql
+```
+
+ARINC command-line examples:
+
+- `python -m ofmx2pgsql import --dsn \"postgresql://...\" --arinc data/arinc_ls/isolated/arinc_ls.pc --apply-migrations --verbose` imports ARINC 424 data into the same tables.
+- `python -m ofmx2pgsql import --dsn \"postgresql://...\" --arinc /path/to/arinc_ls.zip --dry-run --verbose` parses a ZIP-contained ARINC dataset without writing to the database.
+- `python -m ofmx2pgsql import --dsn \"postgresql://...\" --arinc /path/to/arinc_ls.zip --openair /path/to/openair_ls.zip --apply-migrations --verbose` enriches ARINC airspaces with OpenAIR polygons.
+- `python -m ofmx2pgsql validate --dsn \"postgresql://...\" --arinc /path/to/arinc_ls.zip --filter-source arinc --filter-cycle 2601 --output-json` validates only rows imported from ARINC cycle 2601.
+
+
+### Validation Notes
+Validation compares parsed counts to database row counts in the selected schema. If you import multiple regions into the same schema, raw totals won't match a single file. For ARINC imports we tag rows with:
+
+- `source='arinc'`
+- `cycle='2601'` (or whatever cycle is in the ARINC file)
+
+Use those tags to validate only the rows from a specific import:
+
+```sh
+python -m ofmx2pgsql validate \
+  --dsn "postgresql://..." \
+  --arinc /path/to/arinc_ls.zip \
+  --filter-source arinc \
+  --filter-cycle 2601 \
+  --output-json
+```
+
+
 
 ## Development Notes
 See `CONTRIBUTING.md` for workflow and style notes used by maintainers.

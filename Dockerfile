@@ -14,6 +14,8 @@ COPY scripts /app/scripts
 RUN pip install --no-cache-dir .
 
 ENV OFMX_URL="https://snapshots.openflightmaps.org/live/2513/ofmx/lkaa/latest/ofmx_lk.zip" \
+    ARINC_URL="" \
+    OPENAIR_URL="" \
     OFMX_DEST="/data" \
     PG_SCHEMA="ofmx" \
     APPLY_MIGRATIONS="true" \
